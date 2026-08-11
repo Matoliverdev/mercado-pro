@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mercado Pro</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#f5f5f3;--surface:#fff;--surface2:#f9f9f7;
+    --border:#e5e4de;--border2:#d0cfc8;
+    --text:#1a1a19;--text2:#6b6a64;--text3:#9a9890;
+    --accent:#5b5ef4;--accent-bg:#eeeeff;
+    --success:#1d9e75;--success-bg:#e1f5ee;
+    --warning:#ba7517;--warning-bg:#faeeda;
+    --danger:#d85a30;--danger-bg:#faece7;
+    --radius:8px;
+  }
+  @media(prefers-color-scheme:dark){
+    :root{
+      --bg:#1a1a18;--surface:#242422;--surface2:#2c2c2a;
+      --border:#3a3a38;--border2:#4a4a48;
+      --text:#e8e6de;--text2:#9a9890;--text3:#6b6a64;
+      --accent:#7b7ef6;--accent-bg:#1e1e40;
+      --success:#5dcaa5;--success-bg:#04342c;
+      --warning:#ef9f27;--warning-bg:#412402;
+      --danger:#f0997b;--danger-bg:#4a1b0c;
+    }
+  }
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  .app{max-width:680px;margin:0 auto;padding:1rem}
+  .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
+  .logo{font-size:18px;font-weight:500}
+  .logo span{color:var(--accent)}
+  .alert-badge{display:none;background:var(--danger-bg);color:var(--danger);border:0.5px solid var(--danger);border-radius:20px;padding:3px 10px;font-size:12px;font-weight:500;align-items:center;gap:4px}
+  .tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:1.25rem;overflow-x:auto}
+  .tab{padding:8px 14px;border:none;background:transparent;color:var(--text2);font-size:13px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+  .tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:500}
+  .panel{display:none}.panel.active{display:block}
+  .row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+  input,select{height:36px;padding:0 10px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--surface);color:var(--text);font-size:13px;outline:none}
+  input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-bg)}
+  input::placeholder{color:var(--text3)}
+  .btn{height:36px;padding:0 14px;border:0.5px solid var(--border2);border-radius:var(--radius);background:transparent;color:var(--text);font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+  .btn:hover{background:var(--surface2)}
+  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .btn.primary:hover{opacity:.9}
+  .btn.sm{height:28px;padding:0 10px;font-size:12px}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:1rem}
+  .stat{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 12px}
+  .stat-label{font-size:11px;color:var(--text2)}
+  .stat-value{font-size:20px;font-weight:500;margin-top:2px}
+  .stat-value.green{color:var(--success)}.stat-value.amber{color:var(--warning)}.stat-value.red{color:var(--danger)}
+  .card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:6px}
+  .item{display:flex;align-items:center;gap:8px;padding:10px 12px}
+  .item.done{opacity:.5}
+  .item.done .iname{text-decoration:line-through;color:var(--text2)}
+  .check{width:20px;height:20px;border:1.5px solid var(--border2);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+  .check.on{background:var(--success);border-color:var(--success)}
+  .check.on::after{content:'✓';color:#fff;font-size:12px}
+  .iname{flex:1;font-size:13px}
+  .badge{font-size:11px;color:var(--text2);background:var(--surface2);border:0.5px solid var(--border);border-radius:20px;padding:2px 8px;white-space:nowrap}
+  .badge.ok{background:var(--success-bg);color:var(--success);border-color:var(--success)}
+  .badge.warn{background:var(--warning-bg);color:var(--warning);border-color:var(--warning)}
+  .badge.danger{background:var(--danger-bg);color:var(--danger);border-color:var(--danger)}
+  .loja-badge{font-size:11px;padding:2px 8px;border-radius:20px;background:var(--accent-bg);color:var(--accent);border:0.5px solid var(--accent)}
+  .tag{font-size:11px;padding:2px 8px;border-radius:20px;background:var(--surface2);color:var(--text2);border:0.5px solid var(--border)}
+  .alert-box{background:var(--warning-bg);border:0.5px solid var(--warning);border-radius:var(--radius);padding:10px 14px;margin-bottom:1rem;display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--warning)}
+  .section-title{font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin:1rem 0 8px;padding-bottom:6px;border-bottom:0.5px solid var(--border)}
+  .hist-wrap{border:0.5px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1rem}
+  .hist-row{display:grid;grid-template-columns:1fr 75px 95px 70px 80px;gap:6px;padding:8px 12px;border-bottom:0.5px solid var(--border);font-size:12px;align-items:center}
+  .hist-row:last-child{border-bottom:none}
+  .hist-row.head{font-size:11px;color:var(--text2);font-weight:500;background:var(--surface2)}
+  .trend-up{color:var(--danger)}.trend-dn{color:var(--success)}
+  .stock-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:6px}
+  .stock-name{width:130px;font-size:13px;flex-shrink:0}
+  .stock-nums{font-size:12px;color:var(--text2);width:65px;flex-shrink:0}
+  .progress-bar{background:var(--surface2);border-radius:4px;height:6px;overflow:hidden;flex:1}
+  .progress-fill{height:100%;border-radius:4px;background:var(--success);transition:width .3s}
+  .progress-fill.warn{background:var(--warning)}.progress-fill.low{background:var(--danger)}
+  .mini-btn{height:26px;width:26px;border:0.5px solid var(--border);border-radius:var(--radius);background:transparent;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:var(--text2)}
+  .mini-btn:hover{background:var(--surface2)}
+  .stock-actions{display:flex;gap:4px;margin-left:auto}
+  .report-card{background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:1rem 1.25rem;margin-bottom:10px}
+  .report-card h3{font-size:14px;font-weight:500;margin-bottom:8px}
+  .compare-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:13px}
+  .compare-row:last-child{border-bottom:none}
+  .chart-card{background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:1rem 1.25rem;margin-bottom:12px}
+  .chart-card h3{font-size:14px;font-weight:500;margin-bottom:12px}
+  .chip-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .chip{padding:4px 12px;border:0.5px solid var(--border);border-radius:20px;background:transparent;color:var(--text2);font-size:12px;cursor:pointer}
+  .chip.active{background:var(--accent-bg);color:var(--accent);border-color:var(--accent)}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+  .legend-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2)}
+  .legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+  .empty{text-align:center;padding:2.5rem;color:var(--text2);font-size:13px}
+  .loading{text-align:center;padding:1.5rem;color:var(--text2);font-size:13px}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:8px 18px;border-radius:20px;font-size:13px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none}
+  .toast.show{opacity:1}
+  .prog-bar{background:var(--surface2);border-radius:4px;height:6px;overflow:hidden;margin-bottom:1.25rem}
+  .prog-fill{height:100%;border-radius:4px;background:var(--success);transition:width .3s}
+  canvas{width:100%!important}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="logo">🛒 Mercado <span>Pro</span></div>
+    <div class="alert-badge" id="alertBadge">⚠ <span id="alertCount">0</span> alertas</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('lista',this)">📋 Lista</button>
+    <button class="tab" onclick="showTab('historico',this)">🕐 Histórico</button>
+    <button class="tab" onclick="showTab('estoque',this)">📦 Estoque</button>
+    <button class="tab" onclick="showTab('graficos',this)">📈 Gráficos</button>
+    <button class="tab" onclick="showTab('relatorio',this)">📊 Relatório</button>
+  </div>
+
+  <!-- LISTA -->
+  <div id="tab-lista" class="panel active">
+    <div class="row">
+      <input id="lNome" placeholder="Produto" style="flex:2;min-width:120px">
+      <input id="lQtd" placeholder="Qtd" style="width:65px">
+      <input id="lPreco" placeholder="R$ preço" type="number" step="0.01" style="width:95px">
+      <select id="lCat" style="flex:1;min-width:100px">
+        <option>🥩 Carnes</option><option>🥦 Hortifruti</option><option>🥛 Laticínios</option>
+        <option>🍞 Padaria</option><option selected>🥫 Mercearia</option><option>🧴 Higiene</option>
+        <option>🧹 Limpeza</option><option>🧊 Frios</option><option>🍹 Bebidas</option>
+      </select>
+    </div>
+    <div class="row">
+      <input id="lLoja" placeholder="Loja (ex: Carrefour)" style="flex:1;min-width:120px">
+      <button class="btn primary" onclick="addLista()">+ Adicionar</button>
+      <button class="btn" onclick="finalizarCompra()" style="margin-left:auto">✓ Finalizar compra</button>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="stat-label">Itens</div><div class="stat-value" id="lTotal">0</div></div>
+      <div class="stat"><div class="stat-label">No carrinho</div><div class="stat-value green" id="lDone">0</div></div>
+      <div class="stat"><div class="stat-label">Total estimado</div><div class="stat-value amber" id="lValor">R$ 0,00</div></div>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    <div id="listaItens"><div class="loading">Carregando...</div></div>
+  </div>
+
+  <!-- HISTÓRICO -->
+  <div id="tab-historico" class="panel">
+    <div class="row" style="margin-bottom:1rem">
+      <input id="hFiltro" placeholder="Buscar produto..." style="flex:1" oninput="renderHistorico()">
+      <select id="hLoja" style="width:160px" onchange="renderHistorico()"><option value="">Todas as lojas</option></select>
+    </div>
+    <div id="histContent"><div class="loading">Carregando...</div></div>
+  </div>
+
+  <!-- ESTOQUE -->
+  <div id="tab-estoque" class="panel">
+    <div class="row">
+      <input id="eProd" placeholder="Produto" style="flex:2;min-width:120px">
+      <input id="eTotal" placeholder="Qtd comprada" type="number" style="width:115px">
+      <input id="eMin" placeholder="Mín. alerta" type="number" style="width:105px">
+      <button class="btn primary" onclick="addEstoque()">+ Adicionar</button>
+    </div>
+    <div id="alertasBox"></div>
+    <div class="section-title">Controle de estoque</div>
+    <div id="estoqueItens"><div class="loading">Carregando...</div></div>
+  </div>
+
+  <!-- GRÁFICOS -->
+  <div id="tab-graficos" class="panel">
+    <div class="section-title">Evolução de preço por produto</div>
+    <div class="chip-row" id="prodChips"></div>
+    <div class="chart-card">
+      <h3 id="chartProdTitle">Selecione um produto acima</h3>
+      <canvas id="chartPreco" height="220"></canvas>
+      <div class="legend" id="legendPreco"></div>
+    </div>
+    <div class="section-title">Gasto por loja ao longo do tempo</div>
+    <div class="chart-card">
+      <h3>Total gasto por loja</h3>
+      <canvas id="chartLoja" height="200"></canvas>
+      <div class="legend" id="legendLoja"></div>
+    </div>
+    <div class="section-title">Ticket médio por loja</div>
+    <div class="chart-card">
+      <h3>Média por visita</h3>
+      <canvas id="chartTicket" height="180"></canvas>
+    </div>
+  </div>
+
+  <!-- RELATÓRIO -->
+  <div id="tab-relatorio" class="panel">
+    <div id="relContent"><div class="loading">Carregando...</div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://aslafzkvgfvzwxmlvaoc.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzbGFmemt2Z2Z2end4bWx2YW9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0NTUyMTYsImV4cCI6MjEwMjAzMTIxNn0.Ew-Tsjmjzjz1wSFKxPec7UAGL_hI1w-qFc1diWRGM3E';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const PALETTE = ['#5b5ef4','#1D9E75','#D85A30','#BA7517','#7F77DD','#D4537E','#639922','#3B8BD4'];
+let charts = {};
+let historico = [];
+let estoque = [];
+let lista = [];
+let selectedProd = null;
+
+function fmt(v){ return 'R$ ' + Number(v||0).toFixed(2).replace('.',','); }
+function fmtD(d){ if(!d) return ''; const [y,m,di] = d.slice(0,10).split('-'); return di+'/'+m; }
+function fmtDFull(d){ if(!d) return ''; const [y,m,di] = d.slice(0,10).split('-'); return di+'/'+m+'/'+y; }
+
+function toast(msg, dur=2500){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), dur);
+}
+
+// ─── TABS ───────────────────────────────────────────────
+function showTab(id, el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  el.classList.add('active');
+  if(id==='historico') loadHistorico();
+  if(id==='estoque') loadEstoque();
+  if(id==='graficos') loadGraficos();
+  if(id==='relatorio') loadRelatorio();
+}
+
+// ─── LISTA ───────────────────────────────────────────────
+async function loadLista(){
+  const { data, error } = await sb.from('lista').select('*').order('criado_em', { ascending: true });
+  if(error){ toast('Erro ao carregar lista'); return; }
+  lista = data || [];
+  renderLista();
+}
+
+function renderLista(){
+  const total = lista.length;
+  const done = lista.filter(x=>x.feito).length;
+  const valor = lista.filter(x=>x.feito).reduce((s,x)=>s+(x.preco||0),0);
+  document.getElementById('lTotal').textContent = total;
+  document.getElementById('lDone').textContent = done;
+  document.getElementById('lValor').textContent = fmt(valor);
+  document.getElementById('progFill').style.width = total ? Math.round(done/total*100)+'%' : '0%';
+
+  const el = document.getElementById('listaItens');
+  if(!lista.length){ el.innerHTML='<div class="empty">Lista vazia — adicione itens acima</div>'; return; }
+  el.innerHTML = lista.map(i=>`
+    <div class="card item${i.feito?' done':''}">
+      <div class="check${i.feito?' on':''}" onclick="toggleLista('${i.id}',${i.feito})"></div>
+      <span class="iname">${i.nome}</span>
+      <span class="badge">${i.qtd||'1 un'}</span>
+      ${i.preco ? `<span class="badge ok">${fmt(i.preco)}</span>` : ''}
+      <span class="loja-badge">${i.loja||'—'}</span>
+      <button class="btn sm" style="border:none;color:var(--text2)" onclick="delLista('${i.id}')">✕</button>
+    </div>`).join('');
+}
+
+async function addLista(){
+  const nome = document.getElementById('lNome').value.trim();
+  if(!nome){ document.getElementById('lNome').focus(); return; }
+  const payload = {
+    nome, qtd: document.getElementById('lQtd').value||'1 un',
+    preco: parseFloat(document.getElementById('lPreco').value)||null,
+    categoria: document.getElementById('lCat').value,
+    loja: document.getElementById('lLoja').value||'Não informada',
+    feito: false
+  };
+  const { data, error } = await sb.from('lista').insert(payload).select().single();
+  if(error){ toast('Erro ao adicionar item'); return; }
+  lista.push(data);
+  document.getElementById('lNome').value='';
+  document.getElementById('lQtd').value='';
+  document.getElementById('lPreco').value='';
+  renderLista();
+  toast('Item adicionado ✓');
+}
+
+document.getElementById('lNome').addEventListener('keydown', e=>{ if(e.key==='Enter') addLista(); });
+
+async function toggleLista(id, feito){
+  await sb.from('lista').update({ feito: !feito }).eq('id', id);
+  const item = lista.find(x=>x.id===id);
+  if(item) item.feito = !feito;
+  renderLista();
+}
+
+async function delLista(id){
+  await sb.from('lista').delete().eq('id', id);
+  lista = lista.filter(x=>x.id!==id);
+  renderLista();
+}
+
+async function finalizarCompra(){
+  const itens = lista.filter(x=>x.feito);
+  if(!itens.length){ toast('Marque pelo menos um item no carrinho'); return; }
+  const loja = itens[0].loja || 'Não informada';
+  const data = new Date().toISOString().slice(0,10);
+
+  const { data: hist, error: e1 } = await sb.from('historico').insert({ data, loja }).select().single();
+  if(e1){ toast('Erro ao salvar histórico'); return; }
+
+  const hist_itens = itens.map(i=>({ historico_id: hist.id, nome: i.nome, preco: i.preco, qtd: i.qtd, categoria: i.categoria }));
+  await sb.from('historico_itens').insert(hist_itens);
+  await sb.from('lista').delete().in('id', itens.map(i=>i.id));
+
+  lista = lista.filter(x=>!x.feito);
+  renderLista();
+  toast('Compra finalizada e salva no histórico! 🎉', 3000);
+}
+
+// ─── HISTÓRICO ───────────────────────────────────────────
+async function loadHistorico(){
+  document.getElementById('histContent').innerHTML = '<div class="loading">Carregando...</div>';
+  const { data: hists } = await sb.from('historico').select('*, historico_itens(*)').order('data', { ascending: false });
+  historico = hists || [];
+  renderHistorico();
+}
+
+function renderHistorico(){
+  const filtro = document.getElementById('hFiltro').value.toLowerCase();
+  const lojaFiltro = document.getElementById('hLoja').value;
+  const lojas = [...new Set(historico.map(h=>h.loja))];
+  const sel = document.getElementById('hLoja');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">Todas as lojas</option>' + lojas.map(l=>`<option${l===cur?' selected':''}>${l}</option>`).join('');
+
+  let filtered = historico.filter(h=>!lojaFiltro||h.loja===lojaFiltro);
+  if(filtro) filtered = filtered.map(h=>({...h, historico_itens: h.historico_itens.filter(i=>i.nome.toLowerCase().includes(filtro))})).filter(h=>h.historico_itens.length);
+
+  const el = document.getElementById('histContent');
+  if(!filtered.length){ el.innerHTML='<div class="empty">Nenhum histórico encontrado.</div>'; return; }
+
+  el.innerHTML = filtered.map(h=>{
+    const itens = h.historico_itens || [];
+    const total = itens.reduce((s,i)=>s+(i.preco||0),0);
+    return `<div style="margin-bottom:1rem">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+        <span style="font-size:13px;font-weight:500">${fmtDFull(h.data)}</span>
+        <span class="loja-badge">${h.loja}</span>
+        <span class="tag">${itens.length} itens · ${fmt(total)}</span>
+      </div>
+      <div class="hist-wrap">
+        <div class="hist-row head"><span>Produto</span><span>Qtd</span><span>Loja</span><span>Preço</span><span>Variação</span></div>
+        ${itens.map(i=>{
+          const prev = getPrevPrice(i.nome, h.data);
+          const diff = prev ? ((i.preco-prev)/prev*100) : null;
+          const trend = diff===null ? '—' : diff>0 ? `<span class="trend-up">▲ ${diff.toFixed(1)}%</span>` : `<span class="trend-dn">▼ ${Math.abs(diff).toFixed(1)}%</span>`;
+          return `<div class="hist-row"><span>${i.nome}</span><span>${i.qtd||''}</span><span>${h.loja}</span><span>${fmt(i.preco)}</span><span>${trend}</span></div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function getPrevPrice(nome, dataAtual){
+  const entries = historico
+    .filter(h=>h.data<dataAtual)
+    .flatMap(h=>(h.historico_itens||[]).filter(i=>i.nome===nome).map(i=>({...i, data:h.data})))
+    .sort((a,b)=>b.data.localeCompare(a.data));
+  return entries.length ? entries[0].preco : null;
+}
+
+// ─── ESTOQUE ─────────────────────────────────────────────
+async function loadEstoque(){
+  const { data } = await sb.from('estoque').select('*').order('nome');
+  estoque = data || [];
+  renderEstoque();
+}
+
+function renderEstoque(){
+  const alerts = estoque.filter(i=>(i.total-i.usado)<=i.minimo);
+  document.getElementById('alertBadge').style.display = alerts.length ? 'flex' : 'none';
+  document.getElementById('alertCount').textContent = alerts.length;
+
+  const ab = document.getElementById('alertasBox');
+  ab.innerHTML = alerts.length ? `<div class="alert-box">⚠ <div><strong>Estoque baixo:</strong> ${alerts.map(a=>`${a.nome} (${a.total-a.usado} restantes)`).join(', ')}</div></div>` : '';
+
+  const el = document.getElementById('estoqueItens');
+  if(!estoque.length){ el.innerHTML='<div class="empty">Adicione produtos ao estoque acima.</div>'; return; }
+  el.innerHTML = estoque.map(i=>{
+    const rest = i.total-i.usado;
+    const pct = i.total ? Math.round(rest/i.total*100) : 0;
+    const low = rest<=i.minimo, warn = rest<=i.minimo*2&&!low;
+    return `<div class="stock-row">
+      <span class="stock-name">${i.nome}</span>
+      <span class="stock-nums">${rest} / ${i.total}</span>
+      <div class="progress-bar"><div class="progress-fill ${low?'low':warn?'warn':''}" style="width:${pct}%"></div></div>
+      <span class="badge ${low?'danger':warn?'warn':'ok'}" style="margin:0 4px;min-width:52px;text-align:center">${low?'Crítico':warn?'Baixo':'Ok'}</span>
+      <div class="stock-actions">
+        <button class="mini-btn" onclick="useEstoque('${i.id}',${i.usado},${i.total})" title="Usar 1">−</button>
+        <button class="mini-btn" onclick="repoeEstoque('${i.id}',${i.usado})" title="Repor 1">+</button>
+        <button class="mini-btn" onclick="delEstoque('${i.id}')" style="color:var(--danger)" title="Remover">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function addEstoque(){
+  const nome = document.getElementById('eProd').value.trim();
+  if(!nome) return;
+  const payload = { nome, total: parseInt(document.getElementById('eTotal').value)||0, usado: 0, minimo: parseInt(document.getElementById('eMin').value)||2 };
+  const { data, error } = await sb.from('estoque').insert(payload).select().single();
+  if(error){ toast('Erro ao adicionar'); return; }
+  estoque.push(data);
+  document.getElementById('eProd').value='';document.getElementById('eTotal').value='';document.getElementById('eMin').value='';
+  renderEstoque();
+  toast('Produto adicionado ao estoque ✓');
+}
+
+async function useEstoque(id, usado, total){
+  const novoUsado = Math.min(total, usado+1);
+  await sb.from('estoque').update({ usado: novoUsado, atualizado_em: new Date().toISOString() }).eq('id', id);
+  const item = estoque.find(x=>x.id===id);
+  if(item) item.usado = novoUsado;
+  renderEstoque();
+}
+
+async function repoeEstoque(id, usado){
+  const novoUsado = Math.max(0, usado-1);
+  await sb.from('estoque').update({ usado: novoUsado, atualizado_em: new Date().toISOString() }).eq('id', id);
+  const item = estoque.find(x=>x.id===id);
+  if(item) item.usado = novoUsado;
+  renderEstoque();
+}
+
+async function delEstoque(id){
+  await sb.from('estoque').delete().eq('id', id);
+  estoque = estoque.filter(x=>x.id!==id);
+  renderEstoque();
+}
+
+// ─── GRÁFICOS ────────────────────────────────────────────
+async function loadGraficos(){
+  if(!historico.length){
+    const { data: hists } = await sb.from('historico').select('*, historico_itens(*)').order('data');
+    historico = hists || [];
+  }
+  const todos = historico.flatMap(h=>(h.historico_itens||[]).map(i=>i.nome));
+  const prods = [...new Set(todos)].sort();
+  if(!selectedProd || !prods.includes(selectedProd)) selectedProd = prods[0];
+
+  document.getElementById('prodChips').innerHTML = prods.map(p=>`<button class="chip${p===selectedProd?' active':''}" onclick="selectProd('${p}',this)">${p}</button>`).join('');
+
+  if(selectedProd) drawPrecoChart(selectedProd);
+  drawLojaChart();
+  drawTicketChart();
+}
+
+function selectProd(nome, el){
+  selectedProd = nome;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  drawPrecoChart(nome);
+}
+
+function destroyChart(key){ if(charts[key]){ charts[key].destroy(); delete charts[key]; } }
+
+function gridColor(){ return window.matchMedia('(prefers-color-scheme:dark)').matches ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)'; }
+function tickColor(){ return window.matchMedia('(prefers-color-scheme:dark)').matches ? '#888' : '#999'; }
+
+function drawPrecoChart(nome){
+  destroyChart('preco');
+  const entries = historico.flatMap(h=>(h.historico_itens||[]).filter(i=>i.nome===nome).map(i=>({data:h.data.slice(0,10),loja:h.loja,preco:i.preco}))).sort((a,b)=>a.data.localeCompare(b.data));
+  const lojas = [...new Set(entries.map(e=>e.loja))];
+  const allDates = [...new Set(entries.map(e=>e.data))].sort();
+  document.getElementById('chartProdTitle').textContent = `Evolução de preço — ${nome}`;
+  const datasets = lojas.map((loja,li)=>({
+    label:loja, borderColor:PALETTE[li%PALETTE.length], backgroundColor:PALETTE[li%PALETTE.length]+'33',
+    data:allDates.map(d=>{ const e=entries.find(x=>x.data===d&&x.loja===loja); return e?e.preco:null; }),
+    pointRadius:5,borderWidth:2,tension:0.3,spanGaps:true,fill:false
+  }));
+  charts['preco'] = new Chart(document.getElementById('chartPreco'),{
+    type:'line', data:{labels:allDates.map(fmtD),datasets},
+    options:{responsive:true,animation:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${fmt(c.parsed.y)}`}}},
+      scales:{x:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:11}}},
+              y:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:11},callback:v=>'R$'+v.toFixed(0)}}}}
+  });
+  document.getElementById('legendPreco').innerHTML = lojas.map((l,i)=>`<div class="legend-item"><div class="legend-dot" style="background:${PALETTE[i%PALETTE.length]}"></div>${l}</div>`).join('');
+}
+
+function drawLojaChart(){
+  destroyChart('loja');
+  const lojas = [...new Set(historico.map(h=>h.loja))];
+  const allDates = [...new Set(historico.map(h=>h.data.slice(0,10)))].sort();
+  const datasets = lojas.map((loja,li)=>({
+    label:loja, borderColor:PALETTE[li%PALETTE.length], backgroundColor:PALETTE[li%PALETTE.length]+'22',
+    data:allDates.map(d=>{ const h=historico.find(x=>x.data.slice(0,10)===d&&x.loja===loja); return h?parseFloat((h.historico_itens||[]).reduce((s,i)=>s+(i.preco||0),0).toFixed(2)):null; }),
+    pointRadius:5,borderWidth:2,tension:0.3,spanGaps:true,fill:true
+  }));
+  charts['loja'] = new Chart(document.getElementById('chartLoja'),{
+    type:'line', data:{labels:allDates.map(fmtD),datasets},
+    options:{responsive:true,animation:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${fmt(c.parsed.y)}`}}},
+      scales:{x:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:11}}},
+              y:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:11},callback:v=>'R$'+v.toFixed(0)}}}}
+  });
+  document.getElementById('legendLoja').innerHTML = lojas.map((l,i)=>`<div class="legend-item"><div class="legend-dot" style="background:${PALETTE[i%PALETTE.length]}"></div>${l}</div>`).join('');
+}
+
+function drawTicketChart(){
+  destroyChart('ticket');
+  const lojas = [...new Set(historico.map(h=>h.loja))];
+  const totais = lojas.map(loja=>{
+    const visitas = historico.filter(h=>h.loja===loja);
+    return parseFloat((visitas.reduce((s,h)=>s+(h.historico_itens||[]).reduce((ss,i)=>ss+(i.preco||0),0),0)/visitas.length).toFixed(2));
+  });
+  charts['ticket'] = new Chart(document.getElementById('chartTicket'),{
+    type:'bar', data:{labels:lojas,datasets:[{label:'Ticket médio',data:totais,backgroundColor:lojas.map((_,i)=>PALETTE[i%PALETTE.length]+'99'),borderColor:lojas.map((_,i)=>PALETTE[i%PALETTE.length]),borderWidth:1,borderRadius:4}]},
+    options:{responsive:true,animation:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`Ticket médio: ${fmt(c.parsed.y)}`}}},
+      scales:{x:{grid:{display:false},ticks:{color:tickColor(),font:{size:11}}},
+              y:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:11},callback:v=>'R$'+v.toFixed(0)}}}}
+  });
+}
+
+// ─── RELATÓRIO ───────────────────────────────────────────
+async function loadRelatorio(){
+  if(!historico.length){
+    const { data: hists } = await sb.from('historico').select('*, historico_itens(*)').order('data');
+    historico = hists || [];
+  }
+  const el = document.getElementById('relContent');
+  if(!historico.length){ el.innerHTML='<div class="empty">Finalize compras para ver o relatório.</div>'; return; }
+
+  const produtos = {};
+  historico.forEach(h=>(h.historico_itens||[]).forEach(i=>{ if(!produtos[i.nome]) produtos[i.nome]=[]; produtos[i.nome].push({preco:i.preco,loja:h.loja,data:h.data.slice(0,10)}); }));
+
+  const lojas = {};
+  historico.forEach(h=>{ if(!lojas[h.loja]) lojas[h.loja]={total:0,compras:0}; lojas[h.loja].total+=(h.historico_itens||[]).reduce((s,i)=>s+(i.preco||0),0); lojas[h.loja].compras++; });
+
+  let html = '<div class="section-title">Comparativo por produto</div>';
+  Object.entries(produtos).filter(([,v])=>v.length>1).forEach(([nome,entries])=>{
+    const sorted = entries.slice().sort((a,b)=>a.preco-b.preco);
+    const min = sorted[0], max = sorted[sorted.length-1];
+    const byLoja = {};
+    entries.forEach(e=>{ if(!byLoja[e.loja]||e.data>byLoja[e.loja].data) byLoja[e.loja]={preco:e.preco,data:e.data}; });
+    html += `<div class="report-card"><h3>${nome}</h3>`;
+    Object.entries(byLoja).sort((a,b)=>a[1].preco-b[1].preco).forEach(([loja,info])=>{
+      const isBest = info.preco===min.preco;
+      html += `<div class="compare-row"><span>${loja} <span class="tag">${fmtDFull(info.data)}</span> ${isBest?'<span class="badge ok">mais barato</span>':''}</span><span style="font-weight:500">${fmt(info.preco)}</span></div>`;
+    });
+    html += `<div style="margin-top:8px;font-size:12px;color:var(--success)">💰 Comprando no ${min.loja} você economiza ${fmt(max.preco-min.preco)} por unidade</div></div>`;
+  });
+
+  html += '<div class="section-title">Gastos por loja</div><div class="report-card">';
+  Object.entries(lojas).sort((a,b)=>a[1].total-b[1].total).forEach(([loja,info])=>{
+    html += `<div class="compare-row"><span><span class="loja-badge">${loja}</span> <span class="tag">${info.compras} visita${info.compras>1?'s':''}</span></span><span style="font-weight:500">${fmt(info.total)}</span></div>`;
+  });
+  html += '</div>';
+
+  const totalGasto = historico.reduce((s,h)=>s+(h.historico_itens||[]).reduce((ss,i)=>ss+(i.preco||0),0),0);
+  html += `<div class="stats" style="margin-top:.5rem">
+    <div class="stat"><div class="stat-label">Total gasto</div><div class="stat-value amber">${fmt(totalGasto)}</div></div>
+    <div class="stat"><div class="stat-label">Compras</div><div class="stat-value">${historico.length}</div></div>
+    <div class="stat"><div class="stat-label">Produtos</div><div class="stat-value green">${Object.keys(produtos).length}</div></div>
+  </div>`;
+
+  el.innerHTML = html;
+}
+
+// ─── INICIALIZAÇÃO ───────────────────────────────────────
+loadLista();
+loadEstoque();
+</script>
+</body>
+</html>
