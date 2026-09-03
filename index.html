@@ -427,24 +427,28 @@ async function finalizarCompra(){
   (estoqueAtual||[]).forEach(e => estoqueMap[e.nome.toLowerCase()] = e);
 
   for(const item of itens){
-    const qtdNum = parseFloat(item.qtd) || 1;
-    const chave = item.nome.toLowerCase();
+    // qtd pode ser "2", "1.5", ou vazio — garante número válido >= 1
+    const qtdNum = Math.max(1, parseFloat(String(item.qtd).replace(/[^\d.]/g,'')) || 1);
+    const chave = item.nome.trim().toLowerCase();
+    if(!chave) continue; // ignora itens sem nome
+
     const existente = estoqueMap[chave];
 
     if(existente){
-      // Produto já existe: soma ao total (reposição)
-      const novoTotal = existente.total + qtdNum;
+      // Produto já existe: soma quantidade comprada ao total
+      const novoTotal = (existente.total || 0) + qtdNum;
       await sb.from('estoque').update({
         total: novoTotal,
         atualizado_em: new Date().toISOString()
       }).eq('id', existente.id);
     } else {
-      // Produto novo: cria entrada no estoque com mínimo padrão
+      // Produto novo: cria no estoque com mínimo de 20% da quantidade
+      const minimo = Math.max(1, Math.round(qtdNum * 0.2));
       await sb.from('estoque').insert({
-        nome: item.nome,
+        nome: item.nome.trim(),
         total: qtdNum,
         usado: 0,
-        minimo: Math.max(1, Math.floor(qtdNum * 0.2)) // 20% como mínimo padrão
+        minimo
       });
     }
   }
