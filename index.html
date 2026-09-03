@@ -32,8 +32,7 @@
   body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
   .app{max-width:680px;margin:0 auto;padding:1rem}
   .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
-  .logo{font-size:18px;font-weight:500}
-  .logo span{color:var(--accent)}
+  .logo{font-size:18px;font-weight:500}.logo span{color:var(--accent)}
   .alert-badge{display:none;background:var(--danger-bg);color:var(--danger);border:0.5px solid var(--danger);border-radius:20px;padding:3px 10px;font-size:12px;font-weight:500;align-items:center;gap:4px}
   .tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:1.25rem;overflow-x:auto}
   .tab{padding:8px 14px;border:none;background:transparent;color:var(--text2);font-size:13px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
@@ -45,8 +44,7 @@
   input::placeholder{color:var(--text3)}
   .btn{height:36px;padding:0 14px;border:0.5px solid var(--border2);border-radius:var(--radius);background:transparent;color:var(--text);font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
   .btn:hover{background:var(--surface2)}
-  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
-  .btn.primary:hover{opacity:.9}
+  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}.btn.primary:hover{opacity:.9}
   .btn.sm{height:28px;padding:0 10px;font-size:12px}
   .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:1rem}
   .stat{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 12px}
@@ -55,11 +53,9 @@
   .stat-value.green{color:var(--success)}.stat-value.amber{color:var(--warning)}.stat-value.red{color:var(--danger)}
   .card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:6px}
   .item{display:flex;align-items:center;gap:8px;padding:10px 12px}
-  .item.done{opacity:.5}
-  .item.done .iname{text-decoration:line-through;color:var(--text2)}
+  .item.done{opacity:.5}.item.done .iname{text-decoration:line-through;color:var(--text2)}
   .check{width:20px;height:20px;border:1.5px solid var(--border2);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
-  .check.on{background:var(--success);border-color:var(--success)}
-  .check.on::after{content:'✓';color:#fff;font-size:12px}
+  .check.on{background:var(--success);border-color:var(--success)}.check.on::after{content:'✓';color:#fff;font-size:12px}
   .iname{flex:1;font-size:13px}
   .badge{font-size:11px;color:var(--text2);background:var(--surface2);border:0.5px solid var(--border);border-radius:20px;padding:2px 8px;white-space:nowrap}
   .badge.ok{background:var(--success-bg);color:var(--success);border-color:var(--success)}
@@ -70,7 +66,7 @@
   .alert-box{background:var(--warning-bg);border:0.5px solid var(--warning);border-radius:var(--radius);padding:10px 14px;margin-bottom:1rem;display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--warning)}
   .section-title{font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin:1rem 0 8px;padding-bottom:6px;border-bottom:0.5px solid var(--border)}
   .hist-wrap{border:0.5px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1rem}
-  .hist-row{display:grid;grid-template-columns:1fr 75px 95px 70px 80px;gap:6px;padding:8px 12px;border-bottom:0.5px solid var(--border);font-size:12px;align-items:center}
+  .hist-row{display:grid;grid-template-columns:1fr 90px 95px 75px 80px;gap:6px;padding:8px 12px;border-bottom:0.5px solid var(--border);font-size:12px;align-items:center}
   .hist-row:last-child{border-bottom:none}
   .hist-row.head{font-size:11px;color:var(--text2);font-weight:500;background:var(--surface2)}
   .trend-up{color:var(--danger)}.trend-dn{color:var(--success)}
@@ -102,6 +98,13 @@
   .prog-bar{background:var(--surface2);border-radius:4px;height:6px;overflow:hidden;margin-bottom:1.25rem}
   .prog-fill{height:100%;border-radius:4px;background:var(--success);transition:width .3s}
   canvas{width:100%!important}
+
+  /* ── Novidade: bloco de preço por kg ── */
+  .preco-bloco{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .preco-bloco input{flex:1;min-width:80px}
+  .preco-bloco select{width:70px}
+  .preco-calculado{font-size:12px;color:var(--success);font-weight:500;padding:0 4px;white-space:nowrap}
+  .um-badge{font-size:10px;padding:1px 6px;border-radius:20px;background:var(--warning-bg);color:var(--warning);border:0.5px solid var(--warning);white-space:nowrap}
 </style>
 </head>
 <body>
@@ -122,24 +125,41 @@
   <!-- LISTA -->
   <div id="tab-lista" class="panel active">
     <div class="row">
-      <input id="lNome" placeholder="Produto" style="flex:2;min-width:120px">
-      <input id="lQtd" placeholder="Qtd" style="width:65px">
-      <input id="lPreco" placeholder="R$ preço" type="number" step="0.01" style="width:95px">
-      <select id="lCat" style="flex:1;min-width:100px">
+      <input id="lNome" placeholder="Produto" style="flex:2;min-width:140px">
+      <select id="lCat" style="flex:1;min-width:110px">
         <option>🥩 Carnes</option><option>🥦 Hortifruti</option><option>🥛 Laticínios</option>
         <option>🍞 Padaria</option><option selected>🥫 Mercearia</option><option>🧴 Higiene</option>
         <option>🧹 Limpeza</option><option>🧊 Frios</option><option>🍹 Bebidas</option>
       </select>
+    </div>
+    <div class="row preco-bloco">
+      <input id="lQtd" placeholder="Quantidade" type="number" step="0.001" min="0" style="flex:1;min-width:90px" oninput="calcPrecoTotal()">
+      <select id="lUnidade" style="width:70px" onchange="togglePrecoPor()">
+        <option value="un">un</option>
+        <option value="kg">kg</option>
+        <option value="g">g</option>
+        <option value="L">L</option>
+        <option value="ml">ml</option>
+        <option value="cx">cx</option>
+        <option value="pct">pct</option>
+        <option value="fd">fd</option>
+      </select>
+      <input id="lPrecoPor" placeholder="R$/kg" type="number" step="0.01" style="flex:1;min-width:80px" oninput="calcPrecoTotal()">
+      <span id="lPrecoCalc" class="preco-calculado" style="display:none"></span>
+      <input id="lPrecoTotal" placeholder="R$ total" type="number" step="0.01" style="flex:1;min-width:80px" oninput="calcPrecoPor()">
     </div>
     <div class="row">
       <input id="lLoja" placeholder="Loja (ex: Carrefour)" style="flex:1;min-width:120px">
       <button class="btn primary" onclick="addLista()">+ Adicionar</button>
       <button class="btn" onclick="finalizarCompra()" style="margin-left:auto">✓ Finalizar compra</button>
     </div>
+    <div id="lLojaHint" style="font-size:11px;color:var(--text2);margin-bottom:10px;display:none">
+      💡 Loja memorizada da última vez. Pode alterar se for outra.
+    </div>
     <div class="stats">
       <div class="stat"><div class="stat-label">Itens</div><div class="stat-value" id="lTotal">0</div></div>
       <div class="stat"><div class="stat-label">No carrinho</div><div class="stat-value green" id="lDone">0</div></div>
-      <div class="stat"><div class="stat-label">Total estimado</div><div class="stat-value amber" id="lValor">R$ 0,00</div></div>
+      <div class="stat"><div class="stat-label">Total da lista</div><div class="stat-value amber" id="lValor">R$ 0,00</div></div>
     </div>
     <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
     <div id="listaItens"><div class="loading">Carregando...</div></div>
@@ -203,23 +223,81 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const PALETTE = ['#5b5ef4','#1D9E75','#D85A30','#BA7517','#7F77DD','#D4537E','#639922','#3B8BD4'];
-let charts = {};
-let historico = [];
-let estoque = [];
-let lista = [];
-let selectedProd = null;
+let charts = {}, historico = [], estoque = [], lista = [], selectedProd = null;
+let ultimaLoja = localStorage.getItem('ultimaLoja') || '';
 
 function fmt(v){ return 'R$ ' + Number(v||0).toFixed(2).replace('.',','); }
 function fmtD(d){ if(!d) return ''; const [y,m,di] = d.slice(0,10).split('-'); return di+'/'+m; }
 function fmtDFull(d){ if(!d) return ''; const [y,m,di] = d.slice(0,10).split('-'); return di+'/'+m+'/'+y; }
 
-function toast(msg, dur=2500){
+function toast(msg, dur=2800){
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'), dur);
 }
 
-// ─── TABS ───────────────────────────────────────────────
+// ── Unidade de medida / cálculo de preço ──────────────────
+const UNIDADES_PESO = ['kg','g','L','ml']; // unidades que têm preço por medida
+
+function togglePrecoPor(){
+  const un = document.getElementById('lUnidade').value;
+  const porEl = document.getElementById('lPrecoPor');
+  const calcEl = document.getElementById('lPrecoCalc');
+  if(UNIDADES_PESO.includes(un)){
+    porEl.placeholder = `R$/${un}`;
+    porEl.style.display = '';
+    calcEl.style.display = '';
+  } else {
+    porEl.style.display = 'none';
+    calcEl.style.display = 'none';
+    porEl.value = '';
+  }
+  calcPrecoTotal();
+}
+
+function calcPrecoTotal(){
+  const un = document.getElementById('lUnidade').value;
+  if(!UNIDADES_PESO.includes(un)) return;
+  const qtd = parseFloat(document.getElementById('lQtd').value);
+  const precoPor = parseFloat(document.getElementById('lPrecoPor').value);
+  const calcEl = document.getElementById('lPrecoCalc');
+  if(qtd && precoPor){
+    const total = qtd * precoPor;
+    document.getElementById('lPrecoTotal').value = total.toFixed(2);
+    calcEl.textContent = `= ${fmt(total)}`;
+    calcEl.style.display = '';
+  } else {
+    calcEl.style.display = 'none';
+  }
+}
+
+function calcPrecoPor(){
+  const un = document.getElementById('lUnidade').value;
+  if(!UNIDADES_PESO.includes(un)) return;
+  const qtd = parseFloat(document.getElementById('lQtd').value);
+  const total = parseFloat(document.getElementById('lPrecoTotal').value);
+  if(qtd && total){
+    document.getElementById('lPrecoPor').value = (total/qtd).toFixed(2);
+    document.getElementById('lPrecoCalc').textContent = `= ${fmt(total)}`;
+    document.getElementById('lPrecoCalc').style.display = '';
+  }
+}
+
+function getQtdLabel(){
+  const qtd = document.getElementById('lQtd').value;
+  const un = document.getElementById('lUnidade').value;
+  return qtd ? `${qtd} ${un}` : `1 ${un}`;
+}
+
+// ── Loja memorizada ───────────────────────────────────────
+function initLojaHint(){
+  if(ultimaLoja){
+    document.getElementById('lLoja').value = ultimaLoja;
+    document.getElementById('lLojaHint').style.display = 'block';
+  }
+}
+
+// ── TABS ─────────────────────────────────────────────────
 function showTab(id, el){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -231,7 +309,7 @@ function showTab(id, el){
   if(id==='relatorio') loadRelatorio();
 }
 
-// ─── LISTA ───────────────────────────────────────────────
+// ── LISTA ─────────────────────────────────────────────────
 async function loadLista(){
   const { data, error } = await sb.from('lista').select('*').order('criado_em', { ascending: true });
   if(error){ toast('Erro ao carregar lista'); return; }
@@ -242,7 +320,7 @@ async function loadLista(){
 function renderLista(){
   const total = lista.length;
   const done = lista.filter(x=>x.feito).length;
-  const valor = lista.filter(x=>x.feito).reduce((s,x)=>s+(x.preco||0),0);
+  const valor = lista.reduce((s,x)=>s+(x.preco||0),0); // soma TODOS os itens da lista
   document.getElementById('lTotal').textContent = total;
   document.getElementById('lDone').textContent = done;
   document.getElementById('lValor').textContent = fmt(valor);
@@ -250,33 +328,59 @@ function renderLista(){
 
   const el = document.getElementById('listaItens');
   if(!lista.length){ el.innerHTML='<div class="empty">Lista vazia — adicione itens acima</div>'; return; }
-  el.innerHTML = lista.map(i=>`
-    <div class="card item${i.feito?' done':''}">
+  el.innerHTML = lista.map(i=>{
+    const unidade = i.unidade || 'un';
+    const ehPeso = UNIDADES_PESO.includes(unidade);
+    const qtdLabel = i.qtd ? `${i.qtd} ${unidade}` : `1 ${unidade}`;
+    const precoPorLabel = ehPeso && i.preco_por ? `<span class="um-badge">${fmt(i.preco_por)}/${unidade}</span>` : '';
+    return `<div class="card item${i.feito?' done':''}">
       <div class="check${i.feito?' on':''}" onclick="toggleLista('${i.id}',${i.feito})"></div>
       <span class="iname">${i.nome}</span>
-      <span class="badge">${i.qtd||'1 un'}</span>
+      <span class="badge">${qtdLabel}</span>
+      ${precoPorLabel}
       ${i.preco ? `<span class="badge ok">${fmt(i.preco)}</span>` : ''}
       <span class="loja-badge">${i.loja||'—'}</span>
       <button class="btn sm" style="border:none;color:var(--text2)" onclick="delLista('${i.id}')">✕</button>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 async function addLista(){
   const nome = document.getElementById('lNome').value.trim();
   if(!nome){ document.getElementById('lNome').focus(); return; }
+  const unidade = document.getElementById('lUnidade').value;
+  const qtdVal = document.getElementById('lQtd').value;
+  const precoPor = parseFloat(document.getElementById('lPrecoPor').value)||null;
+  const precoTotal = parseFloat(document.getElementById('lPrecoTotal').value)||null;
+  const loja = document.getElementById('lLoja').value.trim() || 'Não informada';
+
   const payload = {
-    nome, qtd: document.getElementById('lQtd').value||'1 un',
-    preco: parseFloat(document.getElementById('lPreco').value)||null,
+    nome,
+    qtd: qtdVal || '1',
+    unidade,
+    preco_por: precoPor,
+    preco: precoTotal,
     categoria: document.getElementById('lCat').value,
-    loja: document.getElementById('lLoja').value||'Não informada',
+    loja,
     feito: false
   };
+
   const { data, error } = await sb.from('lista').insert(payload).select().single();
   if(error){ toast('Erro ao adicionar item'); return; }
   lista.push(data);
-  document.getElementById('lNome').value='';
-  document.getElementById('lQtd').value='';
-  document.getElementById('lPreco').value='';
+
+  // Memoriza a loja
+  if(loja && loja !== 'Não informada'){
+    ultimaLoja = loja;
+    localStorage.setItem('ultimaLoja', loja);
+    document.getElementById('lLojaHint').style.display = 'block';
+  }
+
+  document.getElementById('lNome').value = '';
+  document.getElementById('lQtd').value = '';
+  document.getElementById('lPrecoPor').value = '';
+  document.getElementById('lPrecoTotal').value = '';
+  document.getElementById('lPrecoCalc').style.display = 'none';
   renderLista();
   toast('Item adicionado ✓');
 }
@@ -296,25 +400,67 @@ async function delLista(id){
   renderLista();
 }
 
+// ── FINALIZAR COMPRA — agora atualiza o estoque automaticamente ──
 async function finalizarCompra(){
   const itens = lista.filter(x=>x.feito);
   if(!itens.length){ toast('Marque pelo menos um item no carrinho'); return; }
+
   const loja = itens[0].loja || 'Não informada';
   const data = new Date().toISOString().slice(0,10);
 
+  // 1. Salva no histórico
   const { data: hist, error: e1 } = await sb.from('historico').insert({ data, loja }).select().single();
   if(e1){ toast('Erro ao salvar histórico'); return; }
 
-  const hist_itens = itens.map(i=>({ historico_id: hist.id, nome: i.nome, preco: i.preco, qtd: i.qtd, categoria: i.categoria }));
+  const hist_itens = itens.map(i=>({
+    historico_id: hist.id,
+    nome: i.nome,
+    preco: i.preco,
+    qtd: i.qtd ? `${i.qtd} ${i.unidade||'un'}` : null,
+    categoria: i.categoria
+  }));
   await sb.from('historico_itens').insert(hist_itens);
-  await sb.from('lista').delete().in('id', itens.map(i=>i.id));
 
+  // 2. Atualiza ou cria no estoque automaticamente
+  const { data: estoqueAtual } = await sb.from('estoque').select('*');
+  const estoqueMap = {};
+  (estoqueAtual||[]).forEach(e => estoqueMap[e.nome.toLowerCase()] = e);
+
+  for(const item of itens){
+    const qtdNum = parseFloat(item.qtd) || 1;
+    const chave = item.nome.toLowerCase();
+    const existente = estoqueMap[chave];
+
+    if(existente){
+      // Produto já existe: soma ao total (reposição)
+      const novoTotal = existente.total + qtdNum;
+      await sb.from('estoque').update({
+        total: novoTotal,
+        atualizado_em: new Date().toISOString()
+      }).eq('id', existente.id);
+    } else {
+      // Produto novo: cria entrada no estoque com mínimo padrão
+      await sb.from('estoque').insert({
+        nome: item.nome,
+        total: qtdNum,
+        usado: 0,
+        minimo: Math.max(1, Math.floor(qtdNum * 0.2)) // 20% como mínimo padrão
+      });
+    }
+  }
+
+  // 3. Remove da lista
+  await sb.from('lista').delete().in('id', itens.map(i=>i.id));
   lista = lista.filter(x=>!x.feito);
   renderLista();
-  toast('Compra finalizada e salva no histórico! 🎉', 3000);
+
+  // Recarrega estoque se estiver visível
+  if(estoque.length) loadEstoque();
+
+  toast(`✅ Compra finalizada! ${itens.length} item(s) adicionados ao estoque`, 3500);
 }
 
-// ─── HISTÓRICO ───────────────────────────────────────────
+// ── HISTÓRICO ─────────────────────────────────────────────
 async function loadHistorico(){
   document.getElementById('histContent').innerHTML = '<div class="loading">Carregando...</div>';
   const { data: hists } = await sb.from('historico').select('*, historico_itens(*)').order('data', { ascending: false });
@@ -366,7 +512,7 @@ function getPrevPrice(nome, dataAtual){
   return entries.length ? entries[0].preco : null;
 }
 
-// ─── ESTOQUE ─────────────────────────────────────────────
+// ── ESTOQUE ───────────────────────────────────────────────
 async function loadEstoque(){
   const { data } = await sb.from('estoque').select('*').order('nome');
   estoque = data || [];
@@ -382,9 +528,9 @@ function renderEstoque(){
   ab.innerHTML = alerts.length ? `<div class="alert-box">⚠ <div><strong>Estoque baixo:</strong> ${alerts.map(a=>`${a.nome} (${a.total-a.usado} restantes)`).join(', ')}</div></div>` : '';
 
   const el = document.getElementById('estoqueItens');
-  if(!estoque.length){ el.innerHTML='<div class="empty">Adicione produtos ao estoque acima.</div>'; return; }
+  if(!estoque.length){ el.innerHTML='<div class="empty">O estoque será preenchido automaticamente quando você finalizar uma compra.</div>'; return; }
   el.innerHTML = estoque.map(i=>{
-    const rest = i.total-i.usado;
+    const rest = i.total - i.usado;
     const pct = i.total ? Math.round(rest/i.total*100) : 0;
     const low = rest<=i.minimo, warn = rest<=i.minimo*2&&!low;
     return `<div class="stock-row">
@@ -408,7 +554,7 @@ async function addEstoque(){
   const { data, error } = await sb.from('estoque').insert(payload).select().single();
   if(error){ toast('Erro ao adicionar'); return; }
   estoque.push(data);
-  document.getElementById('eProd').value='';document.getElementById('eTotal').value='';document.getElementById('eMin').value='';
+  document.getElementById('eProd').value=''; document.getElementById('eTotal').value=''; document.getElementById('eMin').value='';
   renderEstoque();
   toast('Produto adicionado ao estoque ✓');
 }
@@ -416,16 +562,14 @@ async function addEstoque(){
 async function useEstoque(id, usado, total){
   const novoUsado = Math.min(total, usado+1);
   await sb.from('estoque').update({ usado: novoUsado, atualizado_em: new Date().toISOString() }).eq('id', id);
-  const item = estoque.find(x=>x.id===id);
-  if(item) item.usado = novoUsado;
+  const item = estoque.find(x=>x.id===id); if(item) item.usado = novoUsado;
   renderEstoque();
 }
 
 async function repoeEstoque(id, usado){
   const novoUsado = Math.max(0, usado-1);
   await sb.from('estoque').update({ usado: novoUsado, atualizado_em: new Date().toISOString() }).eq('id', id);
-  const item = estoque.find(x=>x.id===id);
-  if(item) item.usado = novoUsado;
+  const item = estoque.find(x=>x.id===id); if(item) item.usado = novoUsado;
   renderEstoque();
 }
 
@@ -435,7 +579,7 @@ async function delEstoque(id){
   renderEstoque();
 }
 
-// ─── GRÁFICOS ────────────────────────────────────────────
+// ── GRÁFICOS ──────────────────────────────────────────────
 async function loadGraficos(){
   if(!historico.length){
     const { data: hists } = await sb.from('historico').select('*, historico_itens(*)').order('data');
@@ -444,12 +588,9 @@ async function loadGraficos(){
   const todos = historico.flatMap(h=>(h.historico_itens||[]).map(i=>i.nome));
   const prods = [...new Set(todos)].sort();
   if(!selectedProd || !prods.includes(selectedProd)) selectedProd = prods[0];
-
   document.getElementById('prodChips').innerHTML = prods.map(p=>`<button class="chip${p===selectedProd?' active':''}" onclick="selectProd('${p}',this)">${p}</button>`).join('');
-
   if(selectedProd) drawPrecoChart(selectedProd);
-  drawLojaChart();
-  drawTicketChart();
+  drawLojaChart(); drawTicketChart();
 }
 
 function selectProd(nome, el){
@@ -460,7 +601,6 @@ function selectProd(nome, el){
 }
 
 function destroyChart(key){ if(charts[key]){ charts[key].destroy(); delete charts[key]; } }
-
 function gridColor(){ return window.matchMedia('(prefers-color-scheme:dark)').matches ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)'; }
 function tickColor(){ return window.matchMedia('(prefers-color-scheme:dark)').matches ? '#888' : '#999'; }
 
@@ -520,7 +660,7 @@ function drawTicketChart(){
   });
 }
 
-// ─── RELATÓRIO ───────────────────────────────────────────
+// ── RELATÓRIO ─────────────────────────────────────────────
 async function loadRelatorio(){
   if(!historico.length){
     const { data: hists } = await sb.from('historico').select('*, historico_itens(*)').order('data');
@@ -531,7 +671,6 @@ async function loadRelatorio(){
 
   const produtos = {};
   historico.forEach(h=>(h.historico_itens||[]).forEach(i=>{ if(!produtos[i.nome]) produtos[i.nome]=[]; produtos[i.nome].push({preco:i.preco,loja:h.loja,data:h.data.slice(0,10)}); }));
-
   const lojas = {};
   historico.forEach(h=>{ if(!lojas[h.loja]) lojas[h.loja]={total:0,compras:0}; lojas[h.loja].total+=(h.historico_itens||[]).reduce((s,i)=>s+(i.preco||0),0); lojas[h.loja].compras++; });
 
@@ -543,8 +682,7 @@ async function loadRelatorio(){
     entries.forEach(e=>{ if(!byLoja[e.loja]||e.data>byLoja[e.loja].data) byLoja[e.loja]={preco:e.preco,data:e.data}; });
     html += `<div class="report-card"><h3>${nome}</h3>`;
     Object.entries(byLoja).sort((a,b)=>a[1].preco-b[1].preco).forEach(([loja,info])=>{
-      const isBest = info.preco===min.preco;
-      html += `<div class="compare-row"><span>${loja} <span class="tag">${fmtDFull(info.data)}</span> ${isBest?'<span class="badge ok">mais barato</span>':''}</span><span style="font-weight:500">${fmt(info.preco)}</span></div>`;
+      html += `<div class="compare-row"><span>${loja} <span class="tag">${fmtDFull(info.data)}</span> ${info.preco===min.preco?'<span class="badge ok">mais barato</span>':''}</span><span style="font-weight:500">${fmt(info.preco)}</span></div>`;
     });
     html += `<div style="margin-top:8px;font-size:12px;color:var(--success)">💰 Comprando no ${min.loja} você economiza ${fmt(max.preco-min.preco)} por unidade</div></div>`;
   });
@@ -561,11 +699,23 @@ async function loadRelatorio(){
     <div class="stat"><div class="stat-label">Compras</div><div class="stat-value">${historico.length}</div></div>
     <div class="stat"><div class="stat-label">Produtos</div><div class="stat-value green">${Object.keys(produtos).length}</div></div>
   </div>`;
-
   el.innerHTML = html;
 }
 
-// ─── INICIALIZAÇÃO ───────────────────────────────────────
+// ── ANTI-PAUSA SUPABASE ───────────────────────────────────
+// Faz um ping leve no banco a cada 4 dias para evitar pausa automática
+async function pingBanco(){
+  await sb.from('estoque').select('id').limit(1);
+}
+const QUATRO_DIAS = 4 * 24 * 60 * 60 * 1000;
+const ultimoPing = parseInt(localStorage.getItem('ultimoPing') || '0');
+if(Date.now() - ultimoPing > QUATRO_DIAS){
+  pingBanco().then(()=>localStorage.setItem('ultimoPing', Date.now().toString()));
+}
+
+// ── INICIALIZAÇÃO ─────────────────────────────────────────
+togglePrecoPor(); // configura campos de unidade no carregamento
+initLojaHint();   // preenche loja memorizada
 loadLista();
 loadEstoque();
 </script>
